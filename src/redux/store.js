@@ -1,23 +1,15 @@
 import { combineReducers } from 'redux';
-import { contactsReducer, filterReducer } from './slice';
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import thunk from 'redux-thunk';
-import storage from 'redux-persist/lib/storage';
-
-const persistConfig = {
-  key: 'contacts',
-  storage,
-};
+import { filterReducer } from './filterSlice/slice';
+import { contactsApi } from './contactsSliceRTK/contactsSliceRTK';
 
 const rootReduser = combineReducers({
-  contacts: contactsReducer,
   filter: filterReducer,
+  [contactsApi.reducerPath]: contactsApi.reducer,
 });
-const persistedReducer = persistReducer(persistConfig, rootReduser);
 
 export const store = configureStore({
-  reducer: persistedReducer,
-  middleware: [thunk],
+  reducer: rootReduser,
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware().concat(contactsApi.middleware),
 });
-export const persistor = persistStore(store);
